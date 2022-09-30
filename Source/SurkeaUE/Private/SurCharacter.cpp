@@ -51,16 +51,13 @@ void ASurCharacter::PrimaryAttack() {
 	// 获取模型右手位置
 	FVector RightHandLoc  = GetMesh()->GetSocketLocation("Muzzle_01");
 
-	// Spawn Transform Matrix， spawn的变换矩阵
 	// 朝向角色方向，在角色的右手位置生成
 	FTransform SpawnTM = FTransform(GetActorRotation(), RightHandLoc);
 
-	// 参数设置。
-	// 此处设置碰撞检测规则为：即使碰撞也总是生成，因为粒子在角色中间生成必然碰撞
+	// 此处设置碰撞检测规则为：即使碰撞也总是生成
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	// 所有能放置或生成的对象都是Actor
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
@@ -73,13 +70,13 @@ void ASurCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// “UE中调用的名称”，this指针表示移动这个角色，&自定义移动方法
+	// 移动控制
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASurCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASurCharacter::MoveRight);
-
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-
-	// 绑定按键动作("UE中调用的名称"；触发的时机如按下或释放；对象；具体方法实现)
+	//跳跃
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	// 攻击
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASurCharacter::PrimaryAttack);
 }
