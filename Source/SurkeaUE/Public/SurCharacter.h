@@ -5,6 +5,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class USurInteractionComponent;
 
 UCLASS()
 class SURKEAUE_API ASurCharacter : public ACharacter
@@ -26,6 +27,9 @@ protected:
 	// 投射体子类
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ProjectileClass;
+	// 界面
+	UPROPERTY(VisibleAnywhere)
+	USurInteractionComponent* InteractionComp;
 
 	virtual void BeginPlay() override;
 
@@ -33,6 +37,7 @@ protected:
 	void MoveRight(float value);
 
 	void PrimaryAttack();
+	void PrimaryInteract();
 
 public:
 
