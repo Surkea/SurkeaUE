@@ -6,6 +6,8 @@
 class USpringArmComponent;
 class UCameraComponent;
 class USurInteractionComponent;
+class UAnimMontage;
+class USurAttributeComponent;
 
 UCLASS()
 class SURKEAUE_API ASurCharacter : public ACharacter
@@ -25,11 +27,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 	// 投射体子类
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
-	// 界面
+	// 交互
 	UPROPERTY(VisibleAnywhere)
 	USurInteractionComponent* InteractionComp;
+	// 属性
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USurAttributeComponent* AttributeComp;
 
 	virtual void BeginPlay() override;
 
@@ -38,6 +43,13 @@ protected:
 
 	void PrimaryAttack();
 	void PrimaryInteract();
+	void PrimaryAttack_TimeElapsed();
+
+	// 动画
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackAnim;
+
+	FTimerHandle TimerHandle_PrimaryAttack;
 
 public:
 

@@ -23,7 +23,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	URadialForceComponent* ForceComp;
 
+	virtual void PostInitializeComponents() override;
+
+	// 必须使用UFUNCTION宏才能绑定事件
 	UFUNCTION()
-	void OnActorHit();
+	void OnActorHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 };

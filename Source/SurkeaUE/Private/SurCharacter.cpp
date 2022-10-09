@@ -3,6 +3,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SurInteractionComponent.h"
+#include "SurAttributeComponent.h"
+
 
 ASurCharacter::ASurCharacter()
 {
@@ -16,6 +18,8 @@ ASurCharacter::ASurCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<USurInteractionComponent>("InteractionComp");
+
+	AttributeComp = CreateDefaultSubobject<USurAttributeComponent>("AttributeComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -72,17 +76,27 @@ void ASurCharacter::MoveRight(float value)
 // 左键攻击
 void ASurCharacter::PrimaryAttack() {
 
-	// 获取模型右手位置
-	FVector RightHandLoc = GetMesh()->GetSocketLocation("Muzzle_01");
+	PlayAnimMontage(AttackAnim);
 
-	// 朝向角色方向，在角色的右手位置生成
-	FTransform SpawnTM = FTransform(GetActorRotation(), RightHandLoc);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASurCharacter::PrimaryAttack_TimeElapsed, 0.18f);
 
-	// 此处设置碰撞检测规则为：即使碰撞也总是生成
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+}
 
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+void ASurCharacter::PrimaryAttack_TimeElapsed() {
+	if (ProjectileClass) {
+		// 获取模型右手位置
+		FVector RightHandLoc = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		// 朝向角色方向，在角色的右手位置生成
+		FTransform SpawnTM = FTransform(GetActorRotation(), RightHandLoc);
+
+		// 此处设置碰撞检测规则为：即使碰撞也总是生成
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+	}
 }
 
 // 交互
