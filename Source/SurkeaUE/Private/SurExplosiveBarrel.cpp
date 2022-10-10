@@ -2,6 +2,7 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
+#include "SurAttributeComponent.h"
 
 // Sets default values
 ASurExplosiveBarrel::ASurExplosiveBarrel()
@@ -38,9 +39,14 @@ void ASurExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComp, AActor* Other
 	// log信息的category，log/warning/error等表示日志的详细程度，打印的文字内容
 
 	UE_LOG(LogTemp, Log, TEXT("OtherActor is %s, at game time %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
-	UE_LOG(LogTemp, Warning, TEXT("HHHHHHHHHHHHH"));
 
 	FString CombStr = FString::Printf(TEXT("Hit at %s"), *Hit.ImpactPoint.ToString());
 	// 获取世界，位置，打印的内容，需要attach的actor，颜色，持续时间，是否有影子
 	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombStr, nullptr, FColor::Green, 2.0f, true);
+
+	//USurAttributeComponent* AttributeComp = Cast<USurAttributeComponent>(OtherActor->GetComponentByClass(USurAttributeComponent::StaticClass()));
+	//if (AttributeComp) {
+	//	UE_LOG(LogTemp, Warning, TEXT("In Attribute!!!!!"));
+	//	AttributeComp->ApplyHealthChange(-25.0f);
+	}
 }
