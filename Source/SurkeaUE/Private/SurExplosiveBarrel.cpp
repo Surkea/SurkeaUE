@@ -48,5 +48,5 @@ void ASurExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComp, AActor* Other
 	//if (AttributeComp) {
 	//	UE_LOG(LogTemp, Warning, TEXT("In Attribute!!!!!"));
 	//	AttributeComp->ApplyHealthChange(-25.0f);
-	}
+	//}
 }

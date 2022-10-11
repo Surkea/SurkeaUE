@@ -25,7 +25,8 @@ ASurMagicProjectile::ASurMagicProjectile()
 
 void ASurMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor) {
+	//避免攻击者被自己的粒子伤害
+	if (OtherActor && OtherActor != GetInstigator()) {
 		//获得AttributeComp
 		USurAttributeComponent* AttributeComp = Cast<USurAttributeComponent>(OtherActor->GetComponentByClass(USurAttributeComponent::StaticClass()));
 		// 再次判空，可能碰到的是墙壁、箱子等没有血量的物体
