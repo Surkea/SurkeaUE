@@ -4,6 +4,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SurInteractionComponent.h"
 #include "SurAttributeComponent.h"
+#include "Logging/LogMacros.h"
+#include "DrawDebugHelpers.h"
 
 
 ASurCharacter::ASurCharacter()
@@ -87,8 +89,43 @@ void ASurCharacter::PrimaryAttack_TimeElapsed() {
 		// 获取模型右手位置
 		FVector RightHandLoc = GetMesh()->GetSocketLocation("Muzzle_01");
 
-		// 朝向角色方向，在角色的右手位置生成
-		FTransform SpawnTM = FTransform(GetActorRotation(), RightHandLoc);
+		// 检测距离为 5000 cm = 50 m
+		FVector TraceStart = CameraComp->GetComponentLocation();
+		FVector TraceEnd = TraceStart + ( GetControlRotation().Vector() * 5000 );
+
+		// 检测半径
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		// 不要检测自己角色
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+
+		// 碰撞设置
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		FHitResult Hit;
+		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 3);
+		//GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceEnd, ObjParams, Params)
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params)) {
+			TraceEnd = Hit.ImpactPoint;
+			UE_LOG(LogTemp, Warning, TEXT("Hit : %s"), *Hit.GetActor()->GetFName().ToString());
+			DrawDebugSphere(GetWorld(), TraceEnd, 10.0f, 10, FColor::Yellow, false, 5.0f);
+		}
+		
+
+		// 尾向量 - 头向量 = 方向向量 eg: 起点(0,0) 终点(1,1)，方向向量为(1,1)
+		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - RightHandLoc).Rotator();
+		// 朝向检测到的落点方向，在角色的右手位置生成
+		FTransform SpawnTM = FTransform(ProjRotation, RightHandLoc);
+
+		UE_LOG(LogTemp, Warning, TEXT("ProjRotation: %s\n"), *ProjRotation.Vector().ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("GetControlRotation: %s\n"), *GetControlRotation().Vector().ToString());
 
 		// 此处设置碰撞检测规则为：即使碰撞也总是生成
 		FActorSpawnParameters SpawnParams;
