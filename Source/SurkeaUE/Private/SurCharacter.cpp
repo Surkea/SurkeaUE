@@ -25,16 +25,10 @@ ASurCharacter::ASurCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+
+	AttackAnimDelay = 0.2f;
 }
 
-void ASurCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-}
-void ASurCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 void ASurCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -49,6 +43,7 @@ void ASurCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	// 攻击
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASurCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("BlackHoleAttack", IE_Pressed, this, &ASurCharacter::BlackHoleAttack);
 	// 交互
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASurCharacter::PrimaryInteract);
 }
@@ -80,18 +75,33 @@ void ASurCharacter::PrimaryAttack() {
 
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASurCharacter::PrimaryAttack_TimeElapsed, 0.18f);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASurCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
 
 }
 
 void ASurCharacter::PrimaryAttack_TimeElapsed() {
-	if (ProjectileClass) {
+	SpawnProjectile(ProjectileClass);
+}
+
+// 黑洞攻击
+void ASurCharacter::BlackHoleAttack(){
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASurCharacter::BlackHoleAttack_TimeElapsed, AttackAnimDelay);
+}
+void ASurCharacter::BlackHoleAttack_TimeElapsed() {
+	SpawnProjectile(BlackHoleProjectileClass);
+}
+
+void ASurCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
+{
+	if (ensureAlways(ClassToSpawn)) {
 		// 获取模型右手位置
 		FVector RightHandLoc = GetMesh()->GetSocketLocation("Muzzle_01");
 
 		// 检测距离为 5000 cm = 50 m
 		FVector TraceStart = CameraComp->GetComponentLocation();
-		FVector TraceEnd = TraceStart + ( GetControlRotation().Vector() * 5000 );
+		FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * 5000);
 
 		// 检测半径
 		FCollisionShape Shape;
@@ -117,7 +127,7 @@ void ASurCharacter::PrimaryAttack_TimeElapsed() {
 			UE_LOG(LogTemp, Warning, TEXT("Hit : %s"), *Hit.GetActor()->GetFName().ToString());
 			DrawDebugSphere(GetWorld(), TraceEnd, 10.0f, 10, FColor::Yellow, false, 5.0f);
 		}
-		
+
 
 		// 尾向量 - 头向量 = 方向向量 eg: 起点(0,0) 终点(1,1)，方向向量为(1,1)
 		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - RightHandLoc).Rotator();
@@ -132,8 +142,10 @@ void ASurCharacter::PrimaryAttack_TimeElapsed() {
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = this;
 
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+		// 生成传入的类
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
 	}
+
 }
 
 // 交互

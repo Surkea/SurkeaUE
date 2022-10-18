@@ -29,6 +29,8 @@ protected:
 	// 投射体子类
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> BlackHoleProjectileClass;
 	// 交互
 	UPROPERTY(VisibleAnywhere)
 	USurInteractionComponent* InteractionComp;
@@ -36,14 +38,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USurAttributeComponent* AttributeComp;
 
-	virtual void BeginPlay() override;
+	//virtual void BeginPlay() override;
 
 	void MoveForward(float value);
 	void MoveRight(float value);
 
-	void PrimaryAttack();
+	float AttackAnimDelay;
+
 	void PrimaryInteract();
+	// 攻击
+	void PrimaryAttack();
 	void PrimaryAttack_TimeElapsed();
+	void BlackHoleAttack();
+	void BlackHoleAttack_TimeElapsed();
+
+	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
 	// 动画
 	UPROPERTY(EditAnywhere, Category = "Attack")
@@ -53,7 +62,7 @@ protected:
 
 public:
 
-	virtual void Tick(float DeltaTime) override;
+	//virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
