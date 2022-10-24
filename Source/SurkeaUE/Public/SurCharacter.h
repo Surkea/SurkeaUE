@@ -31,6 +31,8 @@ protected:
 	TSubclassOf<AActor> ProjectileClass;
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> BlackHoleProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> DashProjectileClass;
 	// ½»»¥
 	UPROPERTY(VisibleAnywhere)
 	USurInteractionComponent* InteractionComp;
@@ -51,6 +53,8 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 	void BlackHoleAttack();
 	void BlackHoleAttack_TimeElapsed();
+	void DashAttack();
+	void DashAttack_TimeElapsed();
 
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 

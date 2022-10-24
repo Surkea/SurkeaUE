@@ -44,6 +44,7 @@ void ASurCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	// ¹¥»÷
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASurCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("BlackHoleAttack", IE_Pressed, this, &ASurCharacter::BlackHoleAttack);
+	PlayerInputComponent->BindAction("DashAttack", IE_Pressed, this, &ASurCharacter::DashAttack);
 	// ½»»¥
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASurCharacter::PrimaryInteract);
 }
@@ -91,6 +92,16 @@ void ASurCharacter::BlackHoleAttack(){
 }
 void ASurCharacter::BlackHoleAttack_TimeElapsed() {
 	SpawnProjectile(BlackHoleProjectileClass);
+}
+
+// Î»ÒÆ¹¥»÷
+void ASurCharacter::DashAttack() {
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASurCharacter::DashAttack_TimeElapsed, AttackAnimDelay);
+}
+void ASurCharacter::DashAttack_TimeElapsed() {
+	SpawnProjectile(DashProjectileClass);
 }
 
 void ASurCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
