@@ -6,6 +6,11 @@ USurAttributeComponent::USurAttributeComponent()
 
 }
 
+bool USurAttributeComponent::IsAlive() const
+{
+	return Health > 0.0f;
+}
+
 bool USurAttributeComponent::ApplyHealthChange(float Delta)
 {
 	Health += Delta;

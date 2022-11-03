@@ -19,6 +19,9 @@ protected:
 public:	
 	USurAttributeComponent();
 
+	UFUNCTION(BlueprintCallable)
+	bool IsAlive() const;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 

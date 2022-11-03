@@ -29,6 +29,13 @@ ASurCharacter::ASurCharacter()
 	AttackAnimDelay = 0.2f;
 }
 
+void ASurCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ASurCharacter::OnHealthChanged);
+}
+
 
 void ASurCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -47,6 +54,15 @@ void ASurCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("DashAttack", IE_Pressed, this, &ASurCharacter::DashAttack);
 	// 交互
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASurCharacter::PrimaryInteract);
+}
+
+void ASurCharacter::OnHealthChanged(AActor* InstigatorActor, USurAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	// 血量小于0且（包括治疗）血量变化也小于0
+	if (NewHealth <= 0 && Delta < 0) {
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
 }
 
 // 角色向前移动

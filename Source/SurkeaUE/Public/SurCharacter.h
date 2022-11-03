@@ -20,6 +20,8 @@ public:
 
 protected:
 
+	virtual void PostInitializeComponents() override;
+
 	//µ¯»É±Û×é¼þ
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
@@ -40,12 +42,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USurAttributeComponent* AttributeComp;
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USurAttributeComponent* OwningComp, float NewHealth, float Delta);
+
 	//virtual void BeginPlay() override;
 
+
+	// ÒÆ¶¯
 	void MoveForward(float value);
 	void MoveRight(float value);
-
-	float AttackAnimDelay;
 
 	void PrimaryInteract();
 	// ¹¥»÷
@@ -57,7 +62,7 @@ protected:
 	void DashAttack_TimeElapsed();
 
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
-
+	float AttackAnimDelay;
 	// ¶¯»­
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
